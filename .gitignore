@@ -1,0 +1,27 @@
+# Secrets & credentials
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# API response cache (regenerated on demand, can be large)
+cache/
+
+# --- Personal / scraped data (do not publish) ---
+# The CV that gets emailed out
+nadir_askarov_cv.pdf
+*.pdf
+
+# Generated company/candidate data (contains third-party email addresses)
+candidates.json
+companies.json
+companies_final.json
+
+# Your own Gmail Sent-folder extract and send history
+sent_yesterday.json
+send_log.json
+
+# Generated spreadsheet report
+baku_it_companies.xlsx
+*.xlsx
