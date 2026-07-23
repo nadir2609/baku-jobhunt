@@ -28,7 +28,14 @@ ROOT = Path(__file__).parent
 COMPANIES = ROOT / "companies_final.json"
 SENT_YESTERDAY = ROOT / "sent_yesterday.json"
 LOG = ROOT / "send_log.json"
-CV = ROOT / "nadir_askarov_cv.pdf"
+DEFAULT_CV = ROOT / "nadir_askarov_cv.pdf"
+
+
+def resolve_cv(arg):
+    """CV path from --cv, else the CV_PATH env var, else the built-in default."""
+    chosen = arg or os.environ.get("CV_PATH", "").strip() or str(DEFAULT_CV)
+    p = Path(chosen)
+    return p if p.is_absolute() else ROOT / p
 
 SUBJECT = "AI Engineer & Data Scientist vacancy"
 BODY = ""  # intentionally empty, per spec
@@ -50,20 +57,20 @@ def append_log(entry):
     LOG.write_text(json.dumps(log, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def build_message(sender, to_addr):
+def build_message(sender, to_addr, cv):
     msg = EmailMessage()
     msg["From"] = sender
     msg["To"] = to_addr
     msg["Subject"] = SUBJECT
     msg.set_content(BODY)
 
-    ctype, _ = mimetypes.guess_type(CV.name)
+    ctype, _ = mimetypes.guess_type(cv.name)
     maintype, subtype = (ctype or "application/pdf").split("/", 1)
     msg.add_attachment(
-        CV.read_bytes(),
+        cv.read_bytes(),
         maintype=maintype,
         subtype=subtype,
-        filename=CV.name,
+        filename=cv.name,
     )
     return msg
 
@@ -109,15 +116,21 @@ def main():
     g.add_argument("--test", action="store_true")
     g.add_argument("--live", action="store_true")
     ap.add_argument("--delay", type=int, default=DELAY_SECONDS)
+    ap.add_argument(
+        "--cv",
+        help="Path to the CV file to attach. Overrides the CV_PATH env var and "
+        "the built-in default.",
+    )
     args = ap.parse_args()
 
     load_env()
     sender = os.environ.get("GMAIL_USER", "").strip()
     pw = os.environ.get("GMAIL_APP_PASSWORD", "").strip()
 
-    if not CV.exists():
-        sys.exit(f"ERROR: {CV} not found.")
-    print(f"Attachment: {CV.name} ({CV.stat().st_size:,} bytes)")
+    cv = resolve_cv(args.cv)
+    if not cv.exists():
+        sys.exit(f"ERROR: {cv} not found.")
+    print(f"Attachment: {cv.name} ({cv.stat().st_size:,} bytes)")
     print(f"Subject:    {SUBJECT}")
     print(f"Body:       (empty)\n")
 
@@ -163,7 +176,7 @@ def main():
                 "to": addr,
             }
             try:
-                smtp.send_message(build_message(sender, addr))
+                smtp.send_message(build_message(sender, addr, cv))
                 entry["status"] = "sent"
                 sent += 1
                 print(f"[{i}/{len(targets)}] sent -> {addr}  ({name}, {which})")

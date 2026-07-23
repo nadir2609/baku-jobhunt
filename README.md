@@ -93,8 +93,15 @@ providers at any time with:
 python providers.py          # smoke test: hits Serper + Firecrawl once each
 ```
 
-Finally, drop the CV you want to send into the project root and make sure the
-filename matches `CV` in `send_emails.py` (default: `nadir_askarov_cv.pdf`).
+Finally, choose the CV you want to send. You can pass any file at send time with
+`--cv`, set a `CV_PATH` env var, or just drop your PDF into the project root and
+rely on the built-in default (`nadir_askarov_cv.pdf`):
+
+```bash
+python send_emails.py --live --cv path/to/your_cv.pdf
+# or, once, for the whole session:
+export CV_PATH=path/to/your_cv.pdf
+```
 
 ---
 
@@ -120,7 +127,7 @@ python read_sent.py --date 2026-07-22   # or a specific day
 # 5. Rank and trim to the final 50, folding in anyone emailed yesterday
 python finalize_companies.py
 
-# 6. Send the CV — always in this order:
+# 6. Send the CV — always in this order (add --cv your_cv.pdf to pick a file):
 python send_emails.py --dry-run     # preview the recipient table, sends nothing
 python send_emails.py --test        # send ONE real message to yourself
 python send_emails.py --live        # send to everyone (see safety notes below)
