@@ -1,4 +1,4 @@
-# job-finder
+# Baku Jobhunt
 
 An automated outreach pipeline for a targeted job search. It **discovers** IT and
 software companies in Baku, Azerbaijan, **scrapes** their contact and HR email
@@ -63,8 +63,8 @@ for Serper and Firecrawl plus a `.env` loader and rate-limiting.
 ### Install
 
 ```bash
-git clone https://github.com/<you>/job-finder.git
-cd job-finder
+git clone https://github.com/nadir2609/baku-jobhunt.git
+cd baku-jobhunt
 python -m venv .venv
 # Windows:  .venv\Scripts\activate
 # macOS/Linux:  source .venv/bin/activate
